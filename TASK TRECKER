@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        .container { width: 80%; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; }
+        button { padding: 5px 10px; margin: 5px; border: none; cursor: pointer; }
+        .delete-btn { background-color: #dc3545; color: white; }
+        .complete-btn { background-color: #28a745; color: white; }
+        input, button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Tracker</h1>
+        <input type="text" id="taskInput" placeholder="Task">
+        <input type="date" id="dateIssued">
+        <input type="date" id="dueDate">
+        <button onclick="addTask()" class="complete-btn">Add Task</button>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Date Issued</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="taskTable"></tbody>
+        </table>
+    </div>
+    
+    <script>
+        function addTask() {
+            let taskInput = document.getElementById('taskInput').value.trim();
+            let dateIssued = document.getElementById('dateIssued').value;
+            let dueDate = document.getElementById('dueDate').value;
+            if (taskInput === "" || dateIssued === "" || dueDate === "") return;
+            
+            let table = document.getElementById('taskTable');
+            let row = table.insertRow();
+            row.innerHTML = `
+                <td>${taskInput}</td>
+                <td>${dateIssued}</td>
+                <td>${dueDate}</td>
+                <td class="status">Due</td>
+                <td>
+                    <button class="complete-btn" onclick="completeTask(this)">Complete</button>
+                    <button class="delete-btn" onclick="removeTask(this)">Delete</button>
+                </td>
+            `;
+            document.getElementById('taskInput').value = "";
+            document.getElementById('dateIssued').value = "";
+            document.getElementById('dueDate').value = "";
+        }
+        
+        function completeTask(button) {
+            let row = button.parentElement.parentElement;
+            row.querySelector('.status').innerText = "Completed";
+            row.querySelector('.status').style.color = "green";
+        }
+        
+        function removeTask(button) {
+            button.parentElement.parentElement.remove();
+        }
+    </script>
+</body>
+</html>
