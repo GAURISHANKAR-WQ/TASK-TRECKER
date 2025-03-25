@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
+        h1 { color: #333; }
+        .container { width: 80%; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: center; border: 1px solid #ddd; }
+        th { background-color: #007bff; color: white; }
+        button { padding: 5px 10px; margin: 5px; border: none; cursor: pointer; }
+        .delete-btn { background-color: #dc3545; color: white; }
+        .complete-btn { background-color: #28a745; color: white; }
+        input, button { padding: 10px; margin: 5px; }
+        .speech-bubble { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); max-width: 220px; margin: 20px auto; display: inline-block; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Task Tracker</h1>
+        <input type="text" id="taskInput" placeholder="Task">
+        <input type="date" id="dateIssued">
+        <input type="date" id="dueDate">
+        <button onclick="addTask()" class="complete-btn">Add Task</button>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Date Issued</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="taskTable"></tbody>
+        </table>
+    </div>
+    
+    <div class="speech-bubble" id="speechBubble"></div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTasks();
+            showQuote();
+            setInterval(showQuote, 90000);
+        });
+        
+        const quotes = [
+            "Believe in yourself!",
+            "Every day is a new opportunity.",
+            "Success is no accident.",
+            "Dream big and dare to fail.",
+            "Stay positive, work hard, make it happen.",
+            "Do what you can, with what you have, where you are.",
+            "Act as if what you do makes a difference. It does.",
+            "With self-discipline most anything is possible.",
+            "Your limitation—it's only your imagination.",
+            "Push yourself, because no one else is going to do it for you."
+        ];
+        
+        function showQuote() {
+            let randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            let bubble = document.getElementById("speechBubble");
+            bubble.innerText = randomQuote;
+            speakQuote(randomQuote);
+        }
+        
+        function speakQuote(quote) {
+            let speech = new SpeechSynthesisUtterance(quote);
+            speech.lang = "en-US";
+            speech.rate = 1;
+            window.speechSynthesis.speak(speech);
+        }
+        
+        function addTask() {
+            let taskInput = document.getElementById('taskInput').value.trim();
+            let dateIssued = document.getElementById('dateIssued').value;
+            let dueDate = document.getElementById('dueDate').value;
+            if (taskInput === "" || dateIssued === "" || dueDate === "") return;
+            
+            let task = { text: taskInput, issued: dateIssued, due: dueDate, status: "Due" };
+            let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            tasks.push(task);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            
+            renderTasks();
+            document.getElementById('taskInput').value = "";
+            document.getElementById('dateIssued').value = "";
+            document.getElementById('dueDate').value = "";
+        }
+
+        function loadTasks() {
+            renderTasks();
+        }
+
+        function renderTasks() {
+            let table = document.getElementById("taskTable");
+            table.innerHTML = "";
+            let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            tasks.forEach((task, index) => {
+                let row = table.insertRow();
+                row.innerHTML = `
+                    <td>${task.text}</td>
+                    <td>${task.issued}</td>
+                    <td>${task.due}</td>
+                    <td class="status">${task.status}</td>
+                    <td>
+                        <button class="complete-btn" onclick="completeTask(${index})">Complete</button>
+                        <button class="delete-btn" onclick="removeTask(${index})">Delete</button>
+                    </td>
+                `;
+                if (task.status === "Completed") {
+                    row.querySelector(".status").style.color = "green";
+                }
+            });
+        }
+
+        function completeTask(index) {
+            let tasks = JSON.parse(localStorage.getItem("tasks"));
+            tasks[index].status = "Completed";
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function removeTask(index) {
+            let tasks = JSON.parse(localStorage.getItem("tasks"));
+            tasks.splice(index, 1);
+            localStorage.setItem("tasks", JSON.stringify(tasks));
+            renderTasks();
+        }
+    </script>
+</body>
+</html>
